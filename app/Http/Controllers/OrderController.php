@@ -14,7 +14,6 @@ class OrderController extends Controller
      */
     public function index()
     {
-        // Fetch orders for the logged-in user
         $orders = Order::where('user_id', Auth::id())->get();
         return view('orders.index', compact('orders'));
     }
@@ -24,7 +23,6 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        // Find the order by ID and ensure it belongs to the logged-in user
         $order = Order::where('user_id', Auth::id())->findOrFail($id);
         return view('orders.show', compact('order'));
     }

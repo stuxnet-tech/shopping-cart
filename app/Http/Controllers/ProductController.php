@@ -4,17 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-use App\DataTables\ProductDataTable;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProductImport;
 use App\Jobs\ProductImportJob;
+use App\DataTables\ProductDataTable;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Repositories\ProductRepository;
 use Illuminate\Support\Facades\Redirect;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the products.
-     */
+    protected $productRepository;
+
+    public function __construct(ProductRepository $productRepository)
+    {
+        $this->productRepository = $productRepository;
+    }
+
     public function index(ProductDataTable $productDataTable)
     {
         return $productDataTable->render('product.index');
@@ -33,9 +38,6 @@ class ProductController extends Controller
         //
     }
 
-    /**
-     * Store a newly created product in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -47,19 +49,7 @@ class ProductController extends Controller
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $product = Product::create([
-                'name' => $request->name,
-                'price' => $request->price,
-                'stock' => $request->quantity,
-                'description' => $request->description,
-            ]);
-
-        foreach ($request->file('images') as $image) {
-            $imagePath = $image->store('product_images', 'public');
-            $product->images()->create([
-                'image_path' => $imagePath,
-            ]);
-        }
+        $this->productRepository->create($request->all());
 
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
@@ -69,7 +59,8 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        $product = Product::findOrFail($id);
+        $product = $this->productRepository->find($id);
+
         return view('product.edit', compact('product'));
     }
 
@@ -85,26 +76,23 @@ class ProductController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $product = Product::findOrFail($id);
-        $product->update([
-            'name' => $request->name,
-            'price' => $request->price,
-            'quantity' => $request->quantity,
-            'description' => $request->description,
-        ]);
+        $this->productRepository->update($id, $request->all());
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
 
-    /**
-     * Soft delete the specified product.
-     */
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
-        $product->delete();
+        $this->productRepository->delete($id);
 
         return redirect()->route('products.index')->with('success', 'Product deleted successfully!');
+    }
+
+    public function forceDelete($id)
+    {
+        $this->productRepository->forceDelete($id);
+
+        return redirect()->route('products.index')->with('success', 'Product permanently deleted!');
     }
 
     /**
@@ -144,21 +132,6 @@ class ProductController extends Controller
                 'status' => 'success',
                 'description' => 'No data found in the file.',
             ]);
-    }
-
-    public function forceDelete($id)
-    {
-        $product = Product::withTrashed()->findOrFail($id);
-        
-        $productImages = $product->images;
-        foreach ($productImages as $image) {
-            if (file_exists(public_path($image->image_path))) {
-                unlink(public_path($image->image_path)); 
-            }
-        }
-        
-        $product->forceDelete();
-        return redirect()->route('products.index')->with('success', 'Product permanently deleted!');
     }
 }
 
