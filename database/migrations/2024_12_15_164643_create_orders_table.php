@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('total_amount');
             $table->decimal('tax', 10, 2)->default(0);
+            $table->decimal('grand_total', 10, 2);
+            $table->string('payment_method')->default('COD');
             $table->string('status')->default('Pending');
             $table->timestamps();
             $table->softDeletes();

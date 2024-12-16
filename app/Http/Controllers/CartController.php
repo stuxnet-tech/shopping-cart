@@ -47,8 +47,23 @@ class CartController extends Controller
     /**
      * Checkout the cart and create an order.
      */
-    public function checkout(Request $request)
+    public function checkout()
     {
+        $cart = Cart::getCart();
+        $total = Cart::getTotal();
+        $gst = $total * 0.18;
+        $grandTotal = $total + $gst;
+        
+        return view('cart.checkout', compact('cart', 'total', 'gst', 'grandTotal'));
+    }
+
+    public function submitCheckout(Request $request)
+    {
+        $request->validate([
+            'address' => 'required|string|max:255',
+            'payment_method' => 'required|in:COD',
+        ]);
+
         if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'You must be logged in to place an order.');
         }
@@ -56,27 +71,29 @@ class CartController extends Controller
         $user = Auth::user();
         $cart = Cart::getCart();
         $total = Cart::getTotal();
-        $gst = $total * 0.18; // Apply 18% GST
+        $gst = $total * 0.18;
+        $grandTotal = $total + $gst;
 
-        // Create an order
         $order = Order::create([
             'user_id' => $user->id,
-            'total_amount' => $total + $gst,
+            'address' => $request->address,
+            'payment_method' => $request->payment_method,
+            'total_amount' => $total,
             'tax' => $gst,
+            'grand_total' => $grandTotal,
             'status' => 'Pending',
         ]);
 
-        // Save order items
         foreach ($cart as $item) {
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $item['product']->id,
                 'quantity' => $item['quantity'],
                 'price' => $item['product']->price,
+                'total' => $item['quantity'] * $item['product']->price,
             ]);
         }
 
-        // Clear cart after successful order placement
         session()->forget('cart');
 
         return redirect()->route('orders.index')->with('success', 'Order placed successfully!');

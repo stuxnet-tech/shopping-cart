@@ -19,9 +19,9 @@ use App\Http\Controllers\DashboardController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
@@ -40,12 +40,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('products/upload', [ProductController::class, 'upload'])->name('products.upload');
     Route::get('download-sample', function () {
-        return response()->download(storage_path('app\public\products-sample.csv'));
+        return response()->download(storage_path('app/public/products-sample.csv'));
     })->name('download.sample');
     Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
     Route::resource('products', ProductController::class);
 
     Route::post('cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+    Route::post('cart/checkout/submit', [CartController::class, 'submitCheckout'])->name('cart.submitCheckout'); 
 
     Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('orders/{id}', [OrderController::class, 'show'])->name('orders.show'); 

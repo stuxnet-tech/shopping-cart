@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\DataTables\ProductDataTable;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProductImport;
+use App\Jobs\ProductImportJob;
+use Illuminate\Support\Facades\Redirect;
 
 class ProductController extends Controller
 {
@@ -46,7 +48,7 @@ class ProductController extends Controller
         Product::create([
             'name' => $request->name,
             'price' => $request->price,
-            'quantity' => $request->quantity,
+            'stock' => $request->quantity,
             'description' => $request->description,
         ]);
 
@@ -110,9 +112,29 @@ class ProductController extends Controller
             'file' => 'required|mimes:xlsx,csv',
         ]);
 
-        Excel::import(new ProductImport, $request->file('file'));
+        $modulePath = \App\Models\Product::class;
 
-        return redirect()->route('products.index')->with('success', 'Products imported successfully!');
+        $data = Excel::toArray(new ProductImport, $request->file('file'));
+        $csvData = $data[0] ?? [];
+
+        if (!empty($csvData)) 
+        {
+            $headerData = array_shift($csvData);
+
+            $importData = array_map(function ($row) use ($headerData) {
+                return array_combine($headerData, $row);
+            }, $csvData);
+            
+            ProductImportJob::dispatch($importData, $modulePath);
+
+            return redirect()->route('products.index')->with('success', 'File imported and queued for processing!');
+        }
+
+        return Redirect::back()
+            ->with('message', [
+                'status' => 'success',
+                'description' => 'No data found in the file.',
+            ]);
     }
 }
 
