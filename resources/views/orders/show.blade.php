@@ -8,7 +8,7 @@
     <div class="mt-5">
         <h3 class="font-semibold">Order Details:</h3>
         <p><strong>Total Amount:</strong> ${{ $order->total_amount }}</p>
-        <p><strong>GST (18%):</strong> ${{ $order->gst }}</p>
+        <p><strong>GST (18%):</strong> ${{ $order->tax }}</p>
         <p><strong>Grand Total:</strong> ${{ $order->grand_total }}</p>
         <p><strong>Status:</strong> {{ ucfirst($order->status) }}</p>
         <p><strong>Payment Method:</strong> {{ $order->payment_method }}</p>

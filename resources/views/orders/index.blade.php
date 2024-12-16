@@ -27,7 +27,7 @@
             <tr>
                 <td class="px-4 py-2">{{ $order->id }}</td>
                 <td class="px-4 py-2">${{ $order->total_amount }}</td>
-                <td class="px-4 py-2">${{ $order->gst }}</td>
+                <td class="px-4 py-2">${{ $order->tax }}</td>
                 <td class="px-4 py-2">${{ $order->grand_total }}</td>
                 <td class="px-4 py-2">{{ ucfirst($order->status) }}</td>
                 <td class="px-4 py-2">
