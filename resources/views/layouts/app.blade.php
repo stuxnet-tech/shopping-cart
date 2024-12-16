@@ -32,6 +32,14 @@
                 </header>
             @endisset
 
+            <!-- Impersonation Alert -->
+            @if(session()->has('original_user_id'))
+                <div class="bg-warning text-white text-center py-2">
+                    You are impersonating <strong>{{ Auth::user()->name }}</strong>. 
+                    <a href="{{ route('impersonate.stop') }}" class="text-dark font-bold">Stop Impersonation</a>
+                </div>
+            @endif
+
             <!-- Page Content -->
             <main>
                 <div class="container-fluid p-5">

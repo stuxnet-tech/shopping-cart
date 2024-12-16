@@ -20,6 +20,12 @@
             </div>
 
             <div>
+                <label for="password" class="block text-sm font-medium">Password</label>
+                <input type="password" id="password" name="password" value="{{ old('password') }}" class="w-full p-2 border border-gray-300 rounded-md" required>
+                @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+            </div>
+
+            <div>
                 <label for="role" class="block text-sm font-medium">Role</label>
                 <select id="role" name="role" class="w-full p-2 border border-gray-300 rounded-md">
                     <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
