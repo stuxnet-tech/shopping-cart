@@ -14,11 +14,8 @@ class Order extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'user_id',
-        'status',
-        'total_amount',
-        'gst',
+    protected $guarded = [
+        'id'
     ];
 
     /**

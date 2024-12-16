@@ -14,11 +14,8 @@ class OrderItem extends Model
      *
      * @var array
      */
-    protected $fillable = [
-        'order_id',
-        'product_id',
-        'quantity',
-        'price',
+    protected $guarded = [
+        'id'
     ];
 
     /**

@@ -24,6 +24,7 @@
                 <select id="role" name="role" class="w-full p-2 border border-gray-300 rounded-md">
                     <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    <option value="super_admin" {{ old('role') == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
                 </select>
                 @error('role') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
