@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function ()
         Route::resource('users', UserController::class);
         Route::get('products/upload', [ProductController::class, 'upload'])->name('products.upload');
         Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
+        Route::delete('products/{id}/forceDelete', [ProductController::class, 'forceDelete'])->name('products.forceDelete');
         Route::get('download-sample', function () 
         {
             return response()->download(storage_path('app/public/products-sample.csv'));

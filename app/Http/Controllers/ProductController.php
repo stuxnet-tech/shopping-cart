@@ -43,14 +43,23 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'quantity' => 'required|integer|min:0',
             'description' => 'nullable|string',
+            'images' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        Product::create([
-            'name' => $request->name,
-            'price' => $request->price,
-            'stock' => $request->quantity,
-            'description' => $request->description,
-        ]);
+        $product = Product::create([
+                'name' => $request->name,
+                'price' => $request->price,
+                'stock' => $request->quantity,
+                'description' => $request->description,
+            ]);
+
+        foreach ($request->file('images') as $image) {
+            $imagePath = $image->store('product_images', 'public');
+            $product->images()->create([
+                'image_path' => $imagePath,
+            ]);
+        }
 
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
@@ -135,6 +144,21 @@ class ProductController extends Controller
                 'status' => 'success',
                 'description' => 'No data found in the file.',
             ]);
+    }
+
+    public function forceDelete($id)
+    {
+        $product = Product::withTrashed()->findOrFail($id);
+        
+        $productImages = $product->images;
+        foreach ($productImages as $image) {
+            if (file_exists(public_path($image->image_path))) {
+                unlink(public_path($image->image_path)); 
+            }
+        }
+        
+        $product->forceDelete();
+        return redirect()->route('products.index')->with('success', 'Product permanently deleted!');
     }
 }
 

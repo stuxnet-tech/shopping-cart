@@ -3,8 +3,8 @@
     @section('content')
     <div class="container mx-auto">
         <div class="flex justify-between">
-            <h1 class="text-2xl font-bold">Products</h1>
             <a href="{{ route('products.create') }}" class="btn btn-primary mb-2">Create Product</a>
+            <a href="{{ route('products.upload') }}" class="btn btn-primary mb-2">Import Product</a>
         </div>
 
         @if(session('success'))

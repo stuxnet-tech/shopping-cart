@@ -9,7 +9,7 @@ class DashboardController extends Controller
 {
     public function showDashboard()
     {
-        $products = Product::all(); // Fetch all products
+        $products = Product::with('images')->get();
         return view('dashboard', compact('products'));
     }
 }

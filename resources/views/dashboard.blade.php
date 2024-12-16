@@ -17,7 +17,12 @@
             <p class="mt-2">Stock: {{ $product->stock }}</p>
             <p class="mt-2">{{ $product->description }}</p>
 
-            <!-- Add to Cart Form -->
+            <div class="mt-4">
+                @foreach($product->images as $image)
+                    <img src="{{ asset('storage/' . $image->image_path) }}" alt="Product Image" class="w-full h-auto mb-2">
+                @endforeach
+            </div>
+
             <form action="{{ route('cart.add', $product->id) }}" method="POST" class="mt-4">
                 @csrf
                 <div class="flex items-center">
