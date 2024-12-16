@@ -12,7 +12,22 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->call(function () {
+            $products = Product::onlyTrashed()
+                ->where('deleted_at', '<', now()->subMinutes(10))
+                ->get();
+
+            foreach ($products as $product) {
+                foreach ($product->images as $image) {
+                    $imagePath = public_path($image->image_path);
+                    if (file_exists($imagePath)) {
+                        unlink($imagePath);
+                    }
+                }
+
+                $product->forceDelete();
+            }
+        })->everyTenMinutes();
     }
 
     /**
